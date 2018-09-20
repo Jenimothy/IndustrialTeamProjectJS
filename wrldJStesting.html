@@ -14,6 +14,9 @@
         display: block;
         width: 100%;
       }
+	  
+	  
+	  
     </style>
 
 <head/>
@@ -29,6 +32,8 @@
       <button type="button" onclick="bottomFloor()">Bottom Floor</button>
       <button type="button" onclick="exitIndoors()">Exit</button>
     </div>
+	
+
   
     <div id="map" style="height: 700px"></div>
 
@@ -36,8 +41,12 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" rel="stylesheet" />
 <div id="map" style="height: 250px"></div>
 <script>
+	
 
+	
 	var map = L.Wrld.map("map", "53f4c834b8971f09274f49d43fa3f85c", {center: [56.4599, -2.97],zoom: 16, indoorsEnabled: true} );
+	var mousePoint = null;
+	
 	
 	//This code makes a map appear
 	var marker = L.marker([56.459997, -2.978281], {title: "TEST MARKER!", indoorMapId: "westport_house", indoorMapFloorId: 2}).addTo(map);
@@ -54,14 +63,32 @@
 	
 	
 	//Called when an entity is clicked
-	function onIndoorEntityClicked(event) {
-        event.ids.forEach(displayIDS);
+	function onIndoorEntityClicked(event) 
+	{
+        
+		
+		if (event.ids[1] != null)
+		{
+		
+			map.openPopup('<p style="color:red;">This is a paragraph.</p>', mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
+		
+		}
+		//For now we will create a test popup here with no content
+		
+		
+		
+		
+		
 		
 		//So the second number we get is the correct one
 		
 		//If a second value exists fetch it and place a pop up in that place
 		
-      }
+    }
+	function onMouseDown(event)
+	{
+		mousePoint = event.latlng;
+	}
 	
 	
 	
@@ -83,12 +110,15 @@
 	  function displayIDS(id) {
 		alert(id);
 	  }
+
+	  
 	  
 	//You aren't allowed to leave
 	
 	
 	//Event handlers?
-	map.indoors.on("indoorentityclick", onIndoorEntityClicked);
+	map.indoors.on("indoorentityclick", onIndoorEntityClicked); //When an indoor entity is clicked
+	map.on("mousedown", onMouseDown); //When the mouse is clicked
 
 </script>
 
