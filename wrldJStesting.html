@@ -1,7 +1,10 @@
+
+
 <head>
 
 
 <script src="https://cdn-webgl.wrld3d.com/wrldjs/dist/latest/wrld.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" rel="stylesheet" />
 
 <style>
@@ -42,10 +45,11 @@
 <div id="map" style="height: 250px"></div>
 <script>
 	
-
 	
 	var map = L.Wrld.map("map", "53f4c834b8971f09274f49d43fa3f85c", {center: [56.4599, -2.97],zoom: 16, indoorsEnabled: true} );
 	var mousePoint = null;
+	
+
 	
 	
 	//This code makes a map appear
@@ -65,12 +69,26 @@
 	//Called when an entity is clicked
 	function onIndoorEntityClicked(event) 
 	{
-        
+        var state = 0;
 		
-		if (event.ids[1] != null)
+		if (event.ids[1] != null) //Because of the order of how things are projected a desk ID will always be second as room is always first. Therefore if there is no second value no desk has been clicked on
 		{
+			//Step send the desk to the PHP file for handling stuff using chinese resturant part 5
+			
+			xmlhttp = new XMLHttpRequest(); //This creates a new XMLHttp request in a form that don't care about IE6
 		
-			map.openPopup('<p style="color:red;">This is a paragraph.</p>', mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
+			
+			xmlhttp.onreadystatechange = function()
+			{
+				if (this.readyState == 4 && this.status == 200)
+				{
+					//I don't know what this IF statement does
+					var state = this.responseText; //State is the response to this query
+					deskPopUp(state);
+				}
+			};
+			xmlhttp.open("GET","wrldDatabaseFetch.php?q="+event.ids[1],true);
+			xmlhttp.send();
 		
 		}
 		//For now we will create a test popup here with no content
@@ -87,7 +105,16 @@
     }
 	function onMouseDown(event)
 	{
+		
 		mousePoint = event.latlng;
+
+		
+	}
+	
+	function deskPopUp(state)
+	{
+		var content = '<p style="color:red;">This is a paragraph. </p>' +  state;
+		map.openPopup(content, mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
 	}
 	
 	
