@@ -71,7 +71,7 @@
 	{
         var state = 0;
 		
-		if (event.ids[1] != null) //Because of the order of how things are projected a desk ID will always be second as room is always first. Therefore if there is no second value no desk has been clicked on
+		if (event.ids[1] != null) //Desk's ID is second in the array of id's that click returns. Therefore if there is no second value no desk has been clicked on
 		{
 			//Step send the desk to the PHP file for handling stuff using chinese resturant part 5
 			
@@ -83,8 +83,8 @@
 				if (this.readyState == 4 && this.status == 200)
 				{
 				
-					var state = JSON.parse(this.responseText); //State is the response to this query
-
+					var state = JSON.parse(this.responseText); //State is the response to this query 
+					//For now we will create a test popup here with no content
 					deskPopUp(state);
 				}
 			};
@@ -92,17 +92,6 @@
 			xmlhttp.send();
 		
 		}
-		//For now we will create a test popup here with no content
-		
-		
-		
-		
-		
-		
-		//So the second number we get is the correct one
-		
-		//If a second value exists fetch it and place a pop up in that place
-		
     }
 	function onMouseDown(event)
 	{

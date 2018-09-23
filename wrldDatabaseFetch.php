@@ -15,14 +15,15 @@ $finalData = 0;
 $db = connect();
 
 $sql = 'SELECT '.$deskID.' FROM 18indteam1db.staff;';
+$sql = 'SELECT '.$deskID.' FROM 18indteam1db.staff LIMIT 1'; //this will make sure only one entry is returned so no need for a loop
 
 $result = mysqli_query($database, $sql);
 
 
 while($row=mysqli_fetch_array($result))
 {
-	$finalData = $row['Occupied'];
-	
+	$finalData = $row['Occupied'];//this will just override the contents of finalData and only one state will be stored here
+	$finalData['$row["deskId"]'] = $row['Occupied'];//use that if want to have more than one row in the result
 }	
 
 //Fetches from database
