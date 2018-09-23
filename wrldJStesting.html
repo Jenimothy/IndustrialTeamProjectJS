@@ -82,8 +82,9 @@
 			{
 				if (this.readyState == 4 && this.status == 200)
 				{
-					//I don't know what this IF statement does
+				
 					var state = this.responseText; //State is the response to this query
+
 					deskPopUp(state);
 				}
 			};
@@ -113,7 +114,16 @@
 	
 	function deskPopUp(state)
 	{
-		var content = '<p style="color:red;">This is a paragraph. </p>' +  state;
+		
+		if (state == 1)
+		{
+			var content = '<p style="color:red;">This is the HTML for an occupied desk. </p>';
+		}
+		else
+		{
+			var content = '<p style="color:red;">This is the HTML for an unoccupied desk. </p>';
+		}
+		
 		map.openPopup(content, mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
 	}
 	
