@@ -40,6 +40,7 @@ if (($deskID == 1) || ($deskID == 2) || ($deskID == 4)) //This is a placeholder 
 //This is the end of that code
 
 
-echo $finalData;
+$json_string = json_encode($finalData);
+echo $json_string;
 
 ?>

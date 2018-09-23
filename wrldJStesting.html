@@ -83,7 +83,7 @@
 				if (this.readyState == 4 && this.status == 200)
 				{
 				
-					var state = this.responseText; //State is the response to this query
+					var state = JSON.parse(this.responseText); //State is the response to this query
 
 					deskPopUp(state);
 				}
