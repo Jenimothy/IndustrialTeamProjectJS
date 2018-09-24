@@ -8,40 +8,70 @@ include 'dbconnect.php';
 
 $deskID = $_GET['q'];
 
-$finalData = 0;
-/*
-//This section of code will contain the stuff to get from databse but issues currenty occur so commented out for now
+$name = '';
+$lastName = '';
+$finalData = 2;
+$id = 0;
+$jobStart = 'N/A';
 
 $db = connect();
 
-$sql = 'SELECT '.$deskID.' FROM 18indteam1db.staff;';
-$sql = 'SELECT '.$deskID.' FROM 18indteam1db.staff LIMIT 1'; //this will make sure only one entry is returned so no need for a loop
+$sql = 'SELECT * FROM 18indteam1db.staff Where desk_ID = '.$deskID.';';
 
-$result = mysqli_query($database, $sql);
+$result = mysqli_query($db, $sql);
+
+//This section of code will contain the stuff to get from databse but issues currenty occur so commented out for now
+
+
+
+
 
 
 while($row=mysqli_fetch_array($result))
 {
-	$finalData = $row['Occupied'];//this will just override the contents of finalData and only one state will be stored here
-	$finalData['$row["deskId"]'] = $row['Occupied'];//use that if want to have more than one row in the result
+	$name = $row['first_name'];
+	$lastName = $row['last_Name'];
+	$id = $row['Id'];
+	$finalData = $row['Available'];
+	
 }	
 
 //Fetches from database
 
+
+
+/*
+
+Next step
+
+Find my next job
+Find it's start time
+ 
+
 */
 
+$sql = 'select Time_Start from jobs WHERE Staff_ID = '.$id.';';
 
+$result = mysqli_query($db, $sql);
+while($row=mysqli_fetch_array($result))
+{
+	$jobStart = $row['Time_Start'];
+
+	
+}
+
+
+/*
 if (($deskID == 1) || ($deskID == 2) || ($deskID == 4)) //This is a placeholder for when the databse is sorted out
 {
 	$finalData = 1;
 }
-
+*/
 
 
 //This is the end of that code
+$toReturn = $name.','.$lastName.','.$finalData.','.$jobStart;
 
-
-$json_string = json_encode($finalData);
-echo $json_string;
+echo $toReturn;
 
 ?>

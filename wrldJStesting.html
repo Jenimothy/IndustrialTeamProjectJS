@@ -19,6 +19,9 @@
       }
 	  
 	  
+
+	  
+	  
 	  
     </style>
 
@@ -34,6 +37,7 @@
       <button type="button" onclick="moveDown()">Move Down</button>
       <button type="button" onclick="bottomFloor()">Bottom Floor</button>
       <button type="button" onclick="exitIndoors()">Exit</button>
+	  <button type="button" onclick="updateText()">THIS IS A TEST FEATURE AND WRITTEN IN ALL CAPS</button>
     </div>
 	
 
@@ -48,6 +52,7 @@
 	
 	var map = L.Wrld.map("map", "53f4c834b8971f09274f49d43fa3f85c", {center: [56.4599, -2.97],zoom: 16, indoorsEnabled: true} );
 	var mousePoint = null;
+	var popup;
 	
 
 	
@@ -71,7 +76,7 @@
 	{
         var state = 0;
 		
-		if (event.ids[1] != null) //Desk's ID is second in the array of id's that click returns. Therefore if there is no second value no desk has been clicked on
+		if ((event.ids[1] != null) && (event.ids[1] < 41))//Because of the order of how things are projected a desk ID will always be second as room is always first. Therefore if there is no second value no desk has been clicked on
 		{
 			//Step send the desk to the PHP file for handling stuff using chinese resturant part 5
 			
@@ -80,18 +85,31 @@
 			
 			xmlhttp.onreadystatechange = function()
 			{
+				
 				if (this.readyState == 4 && this.status == 200)
 				{
 				
-					var state = JSON.parse(this.responseText); //State is the response to this query 
-					//For now we will create a test popup here with no content
+					var state = this.responseText; //State is the response to this query
+					
 					deskPopUp(state);
 				}
 			};
+			alert(event.ids[1]);
 			xmlhttp.open("GET","wrldDatabaseFetch.php?q="+event.ids[1],true);
 			xmlhttp.send();
 		
 		}
+		//For now we will create a test popup here with no content
+		
+		
+		
+		
+		
+		
+		//So the second number we get is the correct one
+		
+		//If a second value exists fetch it and place a pop up in that place
+		
     }
 	function onMouseDown(event)
 	{
@@ -103,17 +121,29 @@
 	
 	function deskPopUp(state)
 	{
+		//alert(state);
+		//Now we slit state into 3 sections
+		var split = state.split(',');
 		
-		if (state == 1)
+		
+		if (split[2] == 1)
 		{
-			var content = '<p style="color:red;">This is the HTML for an occupied desk. </p>';
+			var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'+split[0]+' '+split[1]+'</h3><h4 style="background-color:green;">Is available until '+split[3]+'</h4>  </span>';
 		}
 		else
 		{
-			var content = '<p style="color:red;">This is the HTML for an unoccupied desk. </p>';
+			if (split[2] == 2)
+			{
+				var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left"> DESK UNASIGNED</h3><h4 style="background-color:red;"></h4>  </span>';
+			}
+			else 
+			{
+				var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'+split[0]+' '+split[1]+'</h3><h4 style="background-color:red;">Is  not currently at this desk</h4>  </span>';
+			}
 		}
 		
-		map.openPopup(content, mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
+		popup = map.openPopup(content, mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
+		alert(popup.getContent());
 	}
 	
 	
@@ -135,6 +165,11 @@
       }
 	  function displayIDS(id) {
 		alert(id);
+	  }
+	  function updateText() {
+		alert("I AM BEING CALLED");
+		popup.setContent("FHWFHAOIGHSKIGHEUIFGNDJFG");
+		popup.update();
 	  }
 
 	  
