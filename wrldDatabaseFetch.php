@@ -13,6 +13,9 @@ $lastName = '';
 $finalData = 2;
 $id = 0;
 $jobStart = 'N/A';
+$jobEnd = 'N/A';
+$jobStart = 'N/A';
+$jobDate = 'N/A';
 
 $db = connect();
 
@@ -50,7 +53,7 @@ Find it's start time
 
 */
 
-$sql = 'select Time_Start from jobs WHERE Staff_ID = '.$id.';';
+$sql = 'select * from jobs WHERE Staff_ID = '.$id.';';
 
 $result = mysqli_query($db, $sql);
 while($row=mysqli_fetch_array($result))
@@ -71,7 +74,7 @@ if (($deskID == 1) || ($deskID == 2) || ($deskID == 4)) //This is a placeholder 
 
 //This is the end of that code
 $toReturn = $name.','.$lastName.','.$finalData.','.$jobStart;
-
+//This returns the data about the desk
 echo $toReturn;
 
 ?>
