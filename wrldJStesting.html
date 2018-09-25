@@ -94,11 +94,11 @@
 				{
 				
 					var state = this.responseText; //State is the response to this query
-					
+					state = json_decode(state);
 					deskPopUp(state);
 				}
 			};
-			xmlhttp.open("GET","wrldDatabaseFetch.php?q="+event.ids[1],true);
+			xmlhttp.open("GET","https://zeno.computing.dundee.ac.uk/2018-projects/team1/rolling/wrldDatabaseFetch.php?q="+event.ids[1],true);
 			xmlhttp.send();
 		
 		}

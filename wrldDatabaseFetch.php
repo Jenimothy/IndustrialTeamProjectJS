@@ -6,7 +6,10 @@
 
 include 'dbconnect.php';
 
-$deskID = $_GET['q'];
+if(isset($_GET['q']))
+	$deskID = $_GET['q'];
+else
+	$deskID = 1;
 
 $name = '';
 $lastName = '';
@@ -17,51 +20,40 @@ $jobEnd = 'N/A';
 $jobStart = 'N/A';
 $jobDate = 'N/A';
 
+
 $db = connect();
 
-$sql = 'SELECT * FROM 18indteam1db.staff Where desk_ID = '.$deskID.';';
+$stmt = $db->prepare('SELECT * FROM staff Where desk_ID = ? LIMIT 1');
+$stmt->bind_param("i", $deskID);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$result = mysqli_query($db, $sql);
-
-//This section of code will contain the stuff to get from databse but issues currenty occur so commented out for now
-
-
-
-
-
-
-while($row=mysqli_fetch_array($result))
-{
-	$name = $row['first_name'];
-	$lastName = $row['last_Name'];
-	$id = $row['Id'];
-	$finalData = $row['Available'];
-	
-}	
-
-//Fetches from database
+$person = new person();
+$row = $result->fetch_array(MYSQLI_ASSOC);
+$person->firstName = $row['first_name'];
+$person->lastName = $row['last_Name'];
+$person->isPresent = $row['Available'];
+$person->deskId = $row['desk_ID'];
+$person->id = $row['Id'];
 
 
 
 /*
-
 Next step
 
 Find my next job
 Find it's start time
  
-
 */
 
-$sql = 'select * from jobs WHERE Staff_ID = '.$id.';';
+$stmt = $db->prepare('SELECT * FROM jobs WHERE Staff_ID = ? AND Time_Start < NOW() AND Time_End > NOW()');
+$stmt->bind_param("i", $person->id);
+$stmt->execute();
+$result = $stmt->get_result();
+$result = $result->fetch_array(MYSQLI_ASSOC);
 
-$result = mysqli_query($db, $sql);
-while($row=mysqli_fetch_array($result))
-{
-	$jobStart = $row['Time_Start'];
-
-	
-}
+$person->jobDateTimeStart = $result['Time_Start'];
+$person->jobDateTimeEnd = $result['Time_End'];
 
 
 /*
@@ -72,9 +64,20 @@ if (($deskID == 1) || ($deskID == 2) || ($deskID == 4)) //This is a placeholder 
 */
 
 
-//This is the end of that code
-$toReturn = $name.','.$lastName.','.$finalData.','.$jobStart;
+$db->close();
+
 //This returns the data about the desk
-echo $toReturn;
+$final = json_encode($person);
+echo $final;
+ class person{
+	public $id;
+ 	public $firstName;
+ 	public $lastName;
+	public $isPresent;
+	public $deskId;
+	public $jobDateTimeStart;
+	public $jobDateTimeEnd;
+ }
+
 
 ?>
