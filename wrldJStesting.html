@@ -52,7 +52,7 @@
 	var mousePoint = null;
 	var popup = null;
 
-	var updateCnt = 0;
+	var updateCnt = 29;
 	var popUpTime = new Date();
 	var currentContent;
 	var selctedDeskInUse = false;
@@ -71,14 +71,14 @@
 	map.on("initialstreamingcomplete", function(e) {
     
 		map.indoors.enter("westport_house");
-
+		map.indoors.setFloor(2);
 	});
 	
 	
 	//Called when an entity is clicked
 	function onIndoorEntityClicked(event) 
 	{
-
+		highlightDesks();
         var state = 0;
 		
 		if ((event.ids[1] != null) && (event.ids[1] < 41))//Because of the order of how things are projected a desk ID will always be second as room is always first. Therefore if there is no second value no desk has been clicked on
@@ -97,7 +97,7 @@
 					var state = this.responseText; //State is the response to this query
 					
 					state = JSON.parse(state);
-					alert("   ");
+					
 					deskPopUp(state);
 				}
 			};
@@ -108,6 +108,67 @@
 
 		
     }
+	
+	//getHighlightedDesks.php
+	
+	
+	
+	function highlightDesks()
+	{
+		var state;
+		//Get the JSON object
+		xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange = function()
+		{
+			
+			if (this.readyState == 4 && this.status == 200)
+			{
+				
+				state = this.responseText;
+
+				state = JSON.parse(state);
+	
+				performHighlighting(state);
+			}	
+		};
+		xmlhttp.open("GET","getHighlightedDesks.php?",true);
+		xmlhttp.send();
+		
+		
+	}
+	
+	function performHighlighting(state)
+	{
+		//Will highlight all the desks in the array
+
+		for (var i = 0; i < state.id.length; i++) 
+		{
+			var id = state.id[i] + "";
+			if (id.length == 1) {id = '000'+id;}
+			if (id.length == 2) {id = '00'+id;}
+			if (id.length == 3) {id = '0'+id;}
+			//C O D E A S T H E T I C
+
+			//Convert the ID back to a format that WRLD likes
+			
+			if (state.oc[i] == 0)
+			{
+				//alert("LOOPY LOPPY LOPPY LOPPY LOOOPY NO BEAR AND TV MAKE HOMEY GO CRAZY NO BEAR AND TV MAKE HOMER GO GRAZT");
+				//Highlight this desk
+				map.indoors.setEntityHighlights(id, [255, 0, 0, 128]);
+			}
+			if (state.oc[i] == 1)
+			{
+				//alert("LOOPY LOPPY LOPPY LOPPY LOOOPY NO BEAR AND TV MAKE HOMEY GO CRAZY NO BEAR AND TV MAKE HOMER GO GRAZT");
+				//Highlight this desk
+				map.indoors.setEntityHighlights(id, [0, 255, 0, 128]);
+			}
+		}
+	}
+	
+	
+	
+	
 	function onMouseDown(event)
 	{
 		
@@ -119,47 +180,21 @@
 	function deskPopUp(state)
 	{
 		//Now we slit state into 3 sections
-		alert("THIS OCCURS");
+		
 
 		
 		//Set the time
 		
-		
+		alert(state.jobDateTimeStart);
 		popUpTime = new Date(state.jobDateTimeStart);
-		alert(popUpTime);
+		
 			
 		var timeToo = timeUntilNow(popUpTime);
 		
 		currentContent = state.firstName+' '+state.lastName;
+		var content = getAppropriateContent(currentContent, timeToo, state.isPresent);
 		
 		
-		if (state.isPresent == 1)
-		{
-			var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'+currentContent+'</h3><h4 style="background-color:green;">Is available for '+timeToo+' minutes</h4>  </span>';
-			selctedDeskInUse = true;
-		}
-		else
-		{
-			if (state.isPresent == 2)
-			{
-				var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left"> DESK UNASIGNED</h3><h4 style="background-color:red;"></h4>  </span>';
-				currentContent = 'DESK UNASIGNED';
-				selctedDeskInUse = false;
-			}
-			else
-			{
-				var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'+currentContent+'</h3><h4 style="background-color:red;">Is  not currently at this desk</h4>  </span>';
-				selctedDeskInUse = false;
-			}
-		}
-		
-		
-		/*
-		popup = L.popup()
-			.setLatLng(mousePoint)
-			.setContent(content)
-			.openOn(map);
-			*/
 		map.openPopup(content, mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
 		
 	}
@@ -175,31 +210,44 @@
 	
 	function getAppropriateContent(name, time, assigned)
 	{
-	/*
+		
 		//This function will return the approrpate content for a popup based off time
 		
 		var timeDisplayMode = 0; //This is the mode to display time in, 0 is minutes, 1 is hours and minutes, 2 is hours
 		var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'; //The base content for a popup
-		//Add in the name
-		content = content+name
-		
-		//Start off by calculating the mode
-		if (time >= 60)
+		if (name == 'null null')
 		{
-			timeDisplayMode = 1
-			if (time >= 180)
-			{
-				timeDisplayMode = 2;
-			}
-		
+			content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left"> DESK UNASIGNED</h3><h4 style="background-color:red;"></h4>  </span>';
+			return content;
 		}
+		content = content+name;
+		//Now check if somebody is at the desk
 		
+		
+		if (time == 'null')
+		{
+			timeDisplayMode = 3;
+		}
+		else
+		{
+
+			if (time >= 60)
+				{
+					timeDisplayMode = 1
+					if (time >= 180)
+					{
+						timeDisplayMode = 2;
+					}
+				}
+		}
+		//Start off by calculating the mode
+		var timeContent = '';
 		//Generate time display text
 		switch(timeDisplayMode)
 		{
 			case 0:
-				content = content+time+' minutes.';
-				break
+				timeContent = time+' minutes.';
+				break;
 				
 			case 1:
 				//Calculate number of minutes and hours
@@ -210,21 +258,44 @@
 					hours++;
 					timeCalc-60;
 				}
-				content = content+hours+' hours, '+timeCalc+' minutes.';
-				break
+				timeContent = hours+' hours, '+timeCalc+' minutes.';
+				break;
 			case 2:
 				//Just calculate the number of hours
 				var hours = time/60;
 				//Round hours down
 				hours = Math.floor(hours);
-				content = content+hours+' hours';
+				timeContent = hours+' hours';
+				break;
+			case 3:
+				//No assigned job
+				timeContent = 'N/A';
 				break;
 		}
 		
+		switch(assigned)
+		{
+			case "0":
+				content = content+'</h3><h4 style="background-color:red;">Is  not currently at this desk';
+				break;
+			
+			case "1":
+				content = content+'</h3><h4 style="background-color:green;">Is available for ' + timeContent;
+				break;
+		}
+		
+		content = content+'</h4>  </span>';
+		if (name == 'null null')
+		{
+			content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left"> DESK UNASIGNED</h3><h4 style="background-color:red;"></h4>  </span>';
+		}
+		return content;
 		
 		
-		*/
+		
 	}
+	
+	
 	
 	
 	
@@ -258,11 +329,12 @@
 	  
 		updateCnt++;
 
-		if ((updateCnt == 30) && (popUpTime.getTime() != 0))
+		if ((updateCnt == 30))
 		{
-
-			updateCnt = 0;
 			
+			updateCnt = 0;
+			highlightDesks();
+			//Highlight all the desks
 			//Update the date and time
 			
 			//Calculate the current time
@@ -271,7 +343,7 @@
 			var timeToo = timeUntilNow(popUpTime);
 			
 			
-			if ((popup != null) && (selctedDeskInUse == true))
+			if ((popup != null) && (selctedDeskInUse == true) && (popUpTime.getTime() != 0))
 			{
 				var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'+currentContent+'</h3><h4 style="background-color:green;">Is available for '+timeToo+' minutes</h4>  </span>';
 				popup.setContent(content);
