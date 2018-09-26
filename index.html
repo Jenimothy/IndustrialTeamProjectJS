@@ -29,14 +29,6 @@
 
   <div style="position: relative">
   
-  <div id="floorButtons">
-	<button type="button" onclick="topFloor()">Top Floor</button>
-      <button type="button" onclick="moveUp()">Move Up</button>
-      <button type="button" onclick="moveDown()">Move Down</button>
-      <button type="button" onclick="bottomFloor()">Bottom Floor</button>
-      <button type="button" onclick="exitIndoors()">Exit</button>
-
-    </div>
 	
 
   
@@ -62,16 +54,16 @@
 	
 	
 	//This code makes a map appear
-	var marker = L.marker([56.459997, -2.978281], {title: "TEST MARKER!", indoorMapId: "westport_house", indoorMapFloorId: 2}).addTo(map);
+	
 	
 	//This code is from the example, used to control floor buttons https://www.wrld3d.com/wrld.js/latest/docs/examples/move-between-indoor-map-floors/
 	
-	marker.bindPopup('<p style="color:red;">This is a paragraph.</p>').openPopup();
+	
 	
 	map.on("initialstreamingcomplete", function(e) {
     
 		map.indoors.enter("westport_house");
-		map.indoors.setFloor(2);
+
 	});
 	
 	
@@ -234,9 +226,9 @@
 			return content;
 		}
 		content = content+name;
-		//Now check if somebody is at the desk
 		
 		
+
 		timeContent = getTimeString(time);
 		switch(assigned)
 		{
@@ -267,23 +259,13 @@
 	
 	
 	
-	function moveUp() {
-        map.indoors.moveUp();
-		}
-
-      function moveDown() {
-        map.indoors.moveDown();
-      }
-
-      function bottomFloor() {
-        map.indoors.setFloor(0);
-      }
-
-      function exitIndoors() {
-        map.indoors.exit();
-      }
 	  function displayIDS(id) {
 		alert(id);
+	  }
+	  
+	  function entered()
+	  {
+		map.indoors.setFloor(2);
 	  }
 
 
@@ -327,6 +309,7 @@
 	
 	//Event handlers?
 	map.indoors.on("indoorentityclick", onIndoorEntityClicked); //When an indoor entity is clicked
+	map.indoors.on("indoormapenter", entered);
 	map.on("popupopen", popupExists);
 	map.on("mousedown", onMouseDown); //When the mouse is clicked
 	map.on("update", update); //On every frame
