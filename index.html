@@ -92,7 +92,7 @@
 					deskPopUp(state);
 				}
 			};
-			xmlhttp.open("GET","https://zeno.computing.dundee.ac.uk/2018-projects/team1/rolling/wrldDatabaseFetch.php?q="+event.ids[1],true);
+			xmlhttp.open("GET","wrldDatabaseFetch.php?q="+event.ids[1],true);
 			xmlhttp.send();
 		
 		}
@@ -138,6 +138,8 @@
 			
 			if(desk.Available == 0)
 				map.indoors.setEntityHighlights(id, [255,0,0,255]);
+			else if(desk.Available == 2)
+				map.indoors.setEntityHighlights(id, [255,255,0,255]);
 			else
 				map.indoors.setEntityHighlights(id, [0,255,0,255]);
 		});
@@ -164,7 +166,7 @@
 		//Set the time
 		if(state.isPresent==true)
 			timeToUse = state.jobDateTimeStart;
-		else
+		else if (state.isPresent == false)
 			timeToUse = state.jobDateTimeEnd;
 		
 		
@@ -178,7 +180,7 @@
 		
 		
 		currentContent = state.firstName+' '+state.lastName;
-		var content = getAppropriateContent(currentContent, timeToo, state.isPresent);
+		var content = getAppropriateContent(currentContent, timeToo, state);
 		
 		
 		map.openPopup(content, mousePoint, {indoorMapId: 'westport_house', indoorMapFloorId: 2});
@@ -218,7 +220,7 @@
 		return timeContent;
 	}
 	
-	function getAppropriateContent(name, time, present)
+	function getAppropriateContent(name, time, state)
 	{
 		//This function will return the approrpate content for a popup based off time
 		
@@ -229,17 +231,15 @@
 			return content;
 		}
 		content = content+name;
-		
-		
 
 		timeContent = getTimeString(time);
-		switch(present)
+		switch(state.isPresent)
 		{
 			case "0":
-				if(timeContent == null)
+				if(timeContent == null || state.isCurrentlyOnJob == false)
 					content = content+'</h3><h4>Is not currently at this desk';
 				else
-					content = content+'</h3><h4>Is not currently at the desk. Should be back in ' + timeContent;
+					content = content+'</h3><h4>Is currently away for a '+ state.task +' in '+ state.awayLocation +'. Should be back in ' + timeContent;
 				break;
 			
 			case "1":

@@ -9,16 +9,7 @@ include 'dbconnect.php';
 if(isset($_GET['q']))
 	$deskID = $_GET['q'];
 else
-	$deskID = 1;
-
-$name = '';
-$lastName = '';
-$finalData = 2;
-$id = 0;
-$jobStart = 'N/A';
-$jobEnd = 'N/A';
-$jobStart = 'N/A';
-$jobDate = 'N/A';
+	$deskID = 6;
 
 
 $db = connect();
@@ -54,6 +45,8 @@ $stmt->close();
 
 $person->jobDateTimeStart = $result['Time_Start'];
 $person->jobDateTimeEnd = $result['Time_End'];
+$person->awayLocation = $result['Location'];
+$person->task = $result['Desc'];
 
 if($person->jobDateTimeStart == NULL)
 {
@@ -66,9 +59,11 @@ if($person->jobDateTimeStart == NULL)
 	
 	$person->jobDateTimeStart = $result['Time_Start'];
 	$person->jobDateTimeEnd = $result['Time_End'];
-	
+	$person->isCurrentlyOnJob=false;
 	$stmt->close();
 }
+else
+	$person->isCurrentlyOnJob=true;
 
 /*
 if (($deskID == 1) || ($deskID == 2) || ($deskID == 4)) //This is a placeholder for when the databse is sorted out
@@ -90,6 +85,9 @@ echo json_encode($person);
 	public $deskId;
 	public $jobDateTimeStart;
 	public $jobDateTimeEnd;
+	public $awayLocation;
+	public $task;
+	public $isCurrentlyOnJob = true;
  }
 
 
