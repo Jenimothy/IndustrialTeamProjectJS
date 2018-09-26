@@ -162,17 +162,20 @@
 
 		
 		//Set the time
+		if(state.isPresent==true)
+			timeToUse = state.jobDateTimeStart;
+		else
+			timeToUse = state.jobDateTimeEnd;
 		
-
-		popUpTime = new Date(state.jobDateTimeStart);
+		
+		popUpTime = new Date(timeToUse);
 
 		var timeToo = timeUntilNow(popUpTime);
 		
-		if (state.jobDateTimeStart == null)
-		{
-			//This means they have nothing avalible
+		//This means they have nothing avalible
+		if (timeToUse == null)
 			timeToo = null;
-		}
+		
 		
 		currentContent = state.firstName+' '+state.lastName;
 		var content = getAppropriateContent(currentContent, timeToo, state.isPresent);
@@ -215,7 +218,7 @@
 		return timeContent;
 	}
 	
-	function getAppropriateContent(name, time, assigned)
+	function getAppropriateContent(name, time, present)
 	{
 		//This function will return the approrpate content for a popup based off time
 		
@@ -230,10 +233,13 @@
 		
 
 		timeContent = getTimeString(time);
-		switch(assigned)
+		switch(present)
 		{
 			case "0":
-				content = content+'</h3><h4>Is  not currently at this desk';
+				if(timeContent == null)
+					content = content+'</h3><h4>Is not currently at this desk';
+				else
+					content = content+'</h3><h4>Is not currently at the desk. Should be back in ' + timeContent;
 				break;
 			
 			case "1":
@@ -290,7 +296,8 @@
 			//Calculate the current time
 			
 
-			var timeToo = timeUntilNow(popUpTime);
+			var timeToo = getTimeString(timeUntilNow(popUpTime));
+			
 			
 			
 			if ((popup != null) && (selctedDeskInUse == true) && (popUpTime.getTime() != 0))
