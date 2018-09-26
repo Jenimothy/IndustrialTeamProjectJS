@@ -173,18 +173,13 @@
 		
 
 		popUpTime = new Date(state.jobDateTimeStart);
-		
-		
-		
-		
-		
-			
+
 		var timeToo = timeUntilNow(popUpTime);
 		
 		if (state.jobDateTimeStart == null)
 		{
 			//This means they have nothing avalible
-			timeToo = 'null';
+			timeToo = null;
 		}
 		
 		currentContent = state.firstName+' '+state.lastName;
@@ -204,12 +199,34 @@
 		return timeToo;
 	}
 	
+	function getTimeString(timeTo)
+	{
+		if(timeTo == null)
+			return null;
+		var timeContent="";
+		
+		var hours = 0;
+		var days = 0;
+		var minutes = 0;
+		
+		hours = Math.floor(timeTo / 60);
+		days = Math.floor(hours / 24);
+		hours -= days*24;
+		minutes = timeTo - days*24*60 - hours*60;
+		
+		if(days > 0)
+			timeContent = timeContent + days + " days ";
+		if(hours > 0)
+			timeContent = timeContent + hours + " hours ";
+		timeContent = timeContent + minutes + " minutes ";
+		
+		return timeContent;
+	}
+	
 	function getAppropriateContent(name, time, assigned)
 	{
-		
 		//This function will return the approrpate content for a popup based off time
 		
-		var timeDisplayMode = 0; //This is the mode to display time in, 0 is minutes, 1 is hours and minutes, 2 is hours
 		var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'; //The base content for a popup
 		if (name == 'null null')
 		{
@@ -220,55 +237,7 @@
 		//Now check if somebody is at the desk
 		
 		
-		if (time == 'null')
-		{
-			timeDisplayMode = 3;
-		}
-		else
-		{
-
-			if (time >= 60)
-				{
-					timeDisplayMode = 1
-					if (time >= 180)
-					{
-						timeDisplayMode = 2;
-					}
-				}
-		}
-		//Start off by calculating the mode
-		var timeContent = '';
-		//Generate time display text
-		switch(timeDisplayMode)
-		{
-			case 0:
-				timeContent = time+' minutes.';
-				break;
-				
-			case 1:
-				//Calculate number of minutes and hours
-				var timeCalc = time;
-				var hours = 0;
-				while (timeCalc > 60)
-				{
-					hours++;
-					timeCalc-60;
-				}
-				timeContent = hours+' hours, '+timeCalc+' minutes.';
-				break;
-			case 2:
-				//Just calculate the number of hours
-				var hours = time/60;
-				//Round hours down
-				hours = Math.floor(hours);
-				timeContent = hours+' hours';
-				break;
-			case 3:
-				//No assigned job
-				timeContent = 'N/A';
-				break;
-		}
-		
+		timeContent = getTimeString(time);
 		switch(assigned)
 		{
 			case "0":
@@ -276,7 +245,10 @@
 				break;
 			
 			case "1":
-				content = content+'</h3><h4>Is available for ' + timeContent;
+				if(timeContent == null)
+					content = content+'</h3><h4>Is available';
+				else
+					content = content+'</h3><h4>Is available for ' + timeContent;
 				break;
 		}
 		
