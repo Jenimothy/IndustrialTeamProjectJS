@@ -124,7 +124,6 @@
 			{
 				
 				state = this.responseText;
-
 				state = JSON.parse(state);
 	
 				performHighlighting(state);
@@ -139,30 +138,18 @@
 	function performHighlighting(state)
 	{
 		//Will highlight all the desks in the array
-
-		for (var i = 0; i < state.id.length; i++) 
-		{
-			var id = state.id[i] + "";
+		state.map(function(desk){
+			var id = desk.desk_ID + "";
 			if (id.length == 1) {id = '000'+id;}
 			if (id.length == 2) {id = '00'+id;}
 			if (id.length == 3) {id = '0'+id;}
-			//C O D E A S T H E T I C
-
-			//Convert the ID back to a format that WRLD likes
 			
-			if (state.oc[i] == 0)
-			{
-				//alert("LOOPY LOPPY LOPPY LOPPY LOOOPY NO BEAR AND TV MAKE HOMEY GO CRAZY NO BEAR AND TV MAKE HOMER GO GRAZT");
-				//Highlight this desk
-				map.indoors.setEntityHighlights(id, [255, 0, 0, 128]);
-			}
-			if (state.oc[i] == 1)
-			{
-				//alert("LOOPY LOPPY LOPPY LOPPY LOOOPY NO BEAR AND TV MAKE HOMEY GO CRAZY NO BEAR AND TV MAKE HOMER GO GRAZT");
-				//Highlight this desk
-				map.indoors.setEntityHighlights(id, [0, 255, 0, 128]);
-			}
-		}
+			if(desk.Available == 0)
+				map.indoors.setEntityHighlights(id, [255,0,0,255]);
+			else
+				map.indoors.setEntityHighlights(id, [0,255,0,255]);
+		});
+		
 	}
 	
 	
