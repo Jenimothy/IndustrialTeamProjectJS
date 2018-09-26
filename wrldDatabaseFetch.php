@@ -46,6 +46,7 @@ Find it's start time
  
 */
 
+
 $stmt = $db->prepare('SELECT * FROM jobs WHERE Staff_ID = ? AND Time_Start < NOW() AND Time_End > NOW()');
 $stmt->bind_param("i", $person->id);
 $stmt->execute();
