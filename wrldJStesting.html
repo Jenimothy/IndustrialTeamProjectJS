@@ -141,8 +141,8 @@
 		state.map(function(desk){
 			var id = desk.desk_ID + "";
 			if (id.length == 1) {id = '000'+id;}
-			if (id.length == 2) {id = '00'+id;}
-			if (id.length == 3) {id = '0'+id;}
+			else if (id.length == 2) {id = '00'+id;}
+			else if (id.length == 3) {id = '0'+id;}
 			
 			if(desk.Available == 0)
 				map.indoors.setEntityHighlights(id, [255,0,0,255]);
