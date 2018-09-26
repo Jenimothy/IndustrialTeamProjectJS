@@ -55,7 +55,7 @@ $stmt->close();
 $person->jobDateTimeStart = $result['Time_Start'];
 $person->jobDateTimeEnd = $result['Time_End'];
 
-if($person->jobDateTimeStart == null)
+if($person->jobDateTimeStart == NULL)
 {
 	$stmt = $db->prepare('SELECT * FROM jobs WHERE Staff_ID = ? AND Time_Start > NOW() ORDER BY Time_Start ASC LIMIT 1');
 	$stmt->bind_param("i", $person->id);
