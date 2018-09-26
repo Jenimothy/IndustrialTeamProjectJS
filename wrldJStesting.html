@@ -174,8 +174,18 @@
 		alert(state.jobDateTimeStart);
 		popUpTime = new Date(state.jobDateTimeStart);
 		
+		
+		
+		
+		
 			
 		var timeToo = timeUntilNow(popUpTime);
+		
+		if (state.jobDateTimeStart = 'null')
+		{
+			//This means they have nothing avalible
+			timeToo = 'null';
+		}
 		
 		currentContent = state.firstName+' '+state.lastName;
 		var content = getAppropriateContent(currentContent, timeToo, state.isPresent);
@@ -262,11 +272,11 @@
 		switch(assigned)
 		{
 			case "0":
-				content = content+'</h3><h4 style="background-color:red;">Is  not currently at this desk';
+				content = content+'</h3><h4>Is  not currently at this desk';
 				break;
 			
 			case "1":
-				content = content+'</h3><h4 style="background-color:green;">Is available for ' + timeContent;
+				content = content+'</h3><h4>Is available for ' + timeContent;
 				break;
 		}
 		
