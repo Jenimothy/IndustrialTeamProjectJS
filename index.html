@@ -39,29 +39,21 @@
 <div id="map" style="height: 250px"></div>
 <script>
 	
-	
-	var map = L.Wrld.map("map", "53f4c834b8971f09274f49d43fa3f85c", {center: [56.4599, -2.97],zoom: 16, indoorsEnabled: true} );
-	var mousePoint = null;
-	var popup = null;
+	//Global varibles
+	var map = L.Wrld.map("map", "53f4c834b8971f09274f49d43fa3f85c", {center: [56.4599, -2.97],zoom: 16, indoorsEnabled: true} ); //The map
+	var mousePoint = null; //The location the user just clicked
+	var popup = null; //The current displayed popup
 
-	var updateCnt = 29;
-	var popUpTime = new Date();
-	var currentContent;
-	var selctedDeskInUse = false;
-	
-	
-
-	
-	
-	//This code makes a map appear
-	
-	
-	//This code is from the example, used to control floor buttons https://www.wrld3d.com/wrld.js/latest/docs/examples/move-between-indoor-map-floors/
+	var updateCnt = 29; //How long until the next databse load cycle
+	var popUpTime = new Date(); //A date used to calculate time between tasks 
+	var currentContent; //The name of the currently selected desk
+	var selctedDesk; //Ths ID of the currently selected desk
 	
 	
 	
-	map.on("initialstreamingcomplete", function(e) {
-    
+	map.on("initialstreamingcomplete", function(e) 
+	{
+		//When the map loads imediatly move into the building
 		map.indoors.enter("westport_house");
 
 	});
@@ -70,12 +62,14 @@
 	//Called when an entity is clicked
 	function onIndoorEntityClicked(event) 
 	{
-		highlightDesks();
+		//State = 0 if no connection occurs
         var state = 0;
 		
 		if ((event.ids[1] != null) && (event.ids[1] < 41))//Because of the order of how things are projected a desk ID will always be second as room is always first. Therefore if there is no second value no desk has been clicked on
 		{
 			//Step send the desk to the PHP file for handling stuff using chinese resturant part 5
+			
+			selctedDesk = event.ids[1];
 			
 			xmlhttp = new XMLHttpRequest(); //This creates a new XMLHttp request in a form that don't care about IE6
 		
@@ -99,6 +93,9 @@
 
 		
     }
+	
+	
+	
 	
 	//getHighlightedDesks.php
 	
@@ -159,8 +156,11 @@
 	
 	function deskPopUp(state)
 	{
-		//Now we slit state into 3 sections
-		
+		if (state == 0)
+		{
+			alert("CONNECTION ERROR");
+			return;
+		}
 
 		
 		//Set the time
@@ -261,54 +261,95 @@
 		
 	}
 	
-	
-	
-	
-	
-	  function displayIDS(id) {
-		alert(id);
-	  }
-	  
-	  function entered()
-	  {
-		map.indoors.setFloor(2);
-	  }
-
-
-	  
-	  function popupExists(event) {
-	  
-		//This is a bodge
-		popup = event.popup;
-	  }
-	  function update() {
-	  
-		updateCnt++;
-
-		if ((updateCnt == 30))
+	function updateDeskValues()
+	{
+		//We have the current ID
+		var state = 0;
+		xmlhttp = new XMLHttpRequest(); //This creates a new XMLHttp request in a form that don't care about IE6
+		
+			
+		xmlhttp.onreadystatechange = function()
 		{
 			
+			if (this.readyState == 4 && this.status == 200)
+			{
+				
+				var state = this.responseText; //State is the response to this query	
+				state = JSON.parse(state);
+				
+				updateDesk(state);
+			}
+		};
+		xmlhttp.open("GET","wrldDatabaseFetch.php?q="+selctedDesk,true);
+		xmlhttp.send();
+	}
+	
+	function updateDesk(state)
+	{
+		if(state.isPresent==true)
+			timeToUse = state.jobDateTimeStart;
+		else if (state.isPresent == false)
+			timeToUse = state.jobDateTimeEnd;
+		
+		
+		popUpTime = new Date(timeToUse);
+
+		var timeToo = timeUntilNow(popUpTime);
+		
+		//This means they have nothing avalible
+		if (timeToUse == null)
+			timeToo = null;
+		
+		
+		currentContent = state.firstName+' '+state.lastName;
+		var content = getAppropriateContent(currentContent, timeToo, state);
+		popup.setContent(content);
+		popup.update();
+		
+	}
+	
+	
+	
+	function displayIDS(id)
+	{
+		alert(id);
+	}
+	  
+	function entered()
+	{
+		map.indoors.setFloor(2);
+	}
+
+
+	  
+	function popupExists(event) 
+	{
+		//This is a bodge
+		popup = event.popup;
+	}
+	  
+	  
+	function update() {
+	  
+		updateCnt++;
+		if ((updateCnt == 30))
+		{
+		
 			updateCnt = 0;
 			highlightDesks();
 			//Highlight all the desks
 			//Update the date and time
-			
 			//Calculate the current time
-			
-
 			var timeToo = getTimeString(timeUntilNow(popUpTime));
 			
-			
-			
-			if ((popup != null) && (selctedDeskInUse == true) && (popUpTime.getTime() != 0))
+			if ((popup != null))
 			{
-				var content = '<span class="popuptext" id="myPopup"> <h5 align="right"></h5><h3 align="left">'+currentContent+'</h3><h4 style="background-color:green;">Is available for '+timeToo+' minutes</h4>  </span>';
-				popup.setContent(content);
-				popup.update();
+
+				updateDeskValues();
 			}
-			
+		
 		}
-	  }
+	}
 	  
 	  
 	//You aren't allowed to leave
